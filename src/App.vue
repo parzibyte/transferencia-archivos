@@ -1,28 +1,32 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <section>
+          <h1 class="is-size-1">Probando Buefy</h1>
+          <button class="button is-medium" @click="mostrarToast">
+            Mostrar un toast
+          </button>
+        </section>
+      </div>
+    </div>
+    <div class="columns">
+      <div class="column">
+        <subir />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import Subir from "./components/Archivos/Subir.vue"
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  components: { Subir },
+  name: 'app',
+  methods: {
+    mostrarToast() {
+      this.$buefy.toast.open("¡Hola, Buefy! Parzibyte.me")
+    }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>

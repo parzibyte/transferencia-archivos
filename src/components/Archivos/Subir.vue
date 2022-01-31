@@ -1,0 +1,91 @@
+<template>
+  <div>
+    <div class="columns">
+      <div class="column">
+        <b-field>
+          <b-upload v-model="archivo" drag-drop expanded>
+            <section class="section">
+              <div class="content has-text-centered">
+                <p>
+                  <b-icon icon="upload" size="is-large"></b-icon>
+                </p>
+                <p>Clic aquí para buscar el archivo</p>
+              </div>
+            </section>
+          </b-upload>
+        </b-field>
+        <span v-if="archivo" class="tag is-primary">
+          {{ archivo.name }}
+        </span>
+        <br />
+        <b-notification v-show="estaPausado" type="is-danger" :closable="false"
+          >Pausado</b-notification
+        >
+        <br />
+        <b-progress
+          v-show="estaSubiendo"
+          :value="progreso"
+          type="is-success"
+          show-value
+          format="percent"
+        ></b-progress>
+        <b-button :loading="estaSubiendo" type="is-success" @click="subir"
+          >Subir</b-button
+        >
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import { ref, uploadBytesResumable } from 'firebase/storage';
+import FirebaseService from "../../services/FirebaseService.js";
+export default {
+  data: () => ({
+    archivo: null,
+    estaSubiendo: false,
+    estaPausado: false,
+    progreso: 0,
+  }),
+  methods: {
+    async subir() {
+      if (!this.archivo) {
+        return;
+      }
+      const nombre = this.archivo.name;
+      console.log({ nombre });
+      const storage = await FirebaseService.obtenerStorage();
+      const tarea = uploadBytesResumable(ref(storage, nombre), this.archivo);
+      this.estaSubiendo = true;
+      this.estaPausado = false;
+      tarea.on("state_changed",
+        (snapshot) => {
+          this.progreso = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log({ snapshot });
+          if (snapshot.state === "paused") {
+            this.estaPausado = true;
+          } else if (snapshot.state === "running") {
+            this.estaPausado = false;
+          }
+        },
+        (error) => {
+          this.$buefy.toast.open({
+            message: "Error subiendo archivo: " + error.message,
+            type: 'is-danger'
+          });
+          console.log({ error });
+        },
+        () => {
+          this.$buefy.toast.open({
+            message: "Archivo subido correctamente",
+            type: 'is-success'
+          });
+          this.estaSubiendo = false;
+          this.estaPausado = false;
+          this.archivo = null;
+          this.progreso = 0;
+        }
+      );
+    },
+  }
+}
+</script>
