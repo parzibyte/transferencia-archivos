@@ -22,11 +22,30 @@
           >
             {{ props.row.nombre }}
           </b-table-column>
-          <b-table-column field="fecha" label="Fecha de carga" v-slot="props">
+          <b-table-column
+            field="fecha"
+            label="Fecha de carga"
+            sortable
+            v-slot="props"
+          >
             {{ props.row.fecha | timestampAFecha }}
           </b-table-column>
           <b-table-column field="uuid" label="Enlace" v-slot="props">
-            {{ props.row.uuid }}
+            <b-button
+              type="is-info"
+              tag="a"
+              :href="enlaceParaDescargar(props.row)"
+              target="_blank"
+            >
+              <b-icon icon="open-in-new"></b-icon>
+            </b-button>
+            &nbsp;
+            <b-button
+              type="is-success"
+              @click="copiarAlPortapapeles(props.row)"
+            >
+              <b-icon icon="content-copy"></b-icon>
+            </b-button>
           </b-table-column>
           <b-table-column field="id" label="Eliminar" v-slot="props">
             <b-button type="is-danger" @click="eliminar(props.row)">
@@ -53,6 +72,30 @@ export default {
     await this.obtenerArchivosYEscucharCambios();
   },
   methods: {
+    async copiarAlPortapapeles(archivo) {
+      try {
+        this.cargando = true;
+        await navigator.clipboard.writeText(`${window.location.origin}/` + this.enlaceParaDescargar(archivo));
+        this.$buefy.toast.open({
+          message: "Copiado",
+          type: 'is-success'
+        });
+      } catch (error) {
+        this.$buefy.toast.open({
+          message: "Error copiando enlace. Tal vez no estás en un entorno seguro. Error: " + error.message,
+          type: 'is-danger'
+        });
+      } finally {
+        this.cargando = false;
+      }
+    },
+    enlaceParaDescargar(archivo) {
+      return this.$router.resolve({
+        name: "DescargarArchivo", params: {
+          id: archivo.uuid,
+        }
+      }).href;
+    },
     indiceDeArchivo(idArchivo) {
       return this.archivos.findIndex((archivo) => archivo.id === idArchivo);
     },
