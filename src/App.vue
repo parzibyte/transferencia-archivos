@@ -15,13 +15,19 @@
         <subir />
       </div>
     </div>
+    <div class="columns">
+      <div class="column">
+        <ver-archivos />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import Subir from "./components/Archivos/Subir.vue"
+import VerArchivos from "./components/Archivos/VerArchivos.vue"
 export default {
-  components: { Subir },
+  components: { Subir, VerArchivos },
   name: 'app',
   methods: {
     mostrarToast() {
