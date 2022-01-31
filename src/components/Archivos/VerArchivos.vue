@@ -92,7 +92,7 @@ export default {
     enlaceParaDescargar(archivo) {
       return this.$router.resolve({
         name: "DescargarArchivo", params: {
-          id: archivo.uuid,
+          id: archivo.id,
         }
       }).href;
     },
