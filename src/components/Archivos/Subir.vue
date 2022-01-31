@@ -1,5 +1,15 @@
 <template>
-  <div>
+  <div class="section">
+    <div class="columns">
+      <div class="column">
+        <b-button
+          type="is-success"
+          icon-right="format-list-numbered"
+          @click="verArchivos()"
+          >Ver archivos</b-button
+        >
+      </div>
+    </div>
     <div class="columns">
       <div class="column">
         <b-field>
@@ -49,6 +59,11 @@ export default {
     progreso: 0,
   }),
   methods: {
+    verArchivos() {
+      this.$router.push({
+        name: "VerArchivos",
+      });
+    },
     async subir() {
       if (!this.archivo) {
         return;

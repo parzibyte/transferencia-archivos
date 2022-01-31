@@ -1,8 +1,10 @@
 <template>
-  <div>
+  <div class="section">
     <div class="columns">
       <div class="column">
-        <p>Archivos</p>
+        <b-button type="is-success" icon-right="plus" @click="subirArchivo()"
+          >Nuevo</b-button
+        >
       </div>
     </div>
     <div class="columns">
@@ -72,6 +74,9 @@ export default {
     await this.obtenerArchivosYEscucharCambios();
   },
   methods: {
+    subirArchivo() {
+      this.$router.push({ name: "Subir" });
+    },
     async copiarAlPortapapeles(archivo) {
       try {
         this.cargando = true;
