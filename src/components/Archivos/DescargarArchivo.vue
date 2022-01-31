@@ -12,8 +12,8 @@
       <b-notification type="is-info" :closable="false" has-icon>
         <p class="is-size-5">
           No olvide respaldar el archivo, ya que el enlace tiene una fecha de
-          expiración. Además, la mayoría de veces el reenvío del archivo tiene un
-          costo
+          expiración. Además, la mayoría de veces el reenvío del archivo tiene
+          un costo
         </p>
       </b-notification>
     </div>
@@ -48,9 +48,17 @@ export default {
   methods: {
     async descargar() {
       this.cargando = true;
-      const url = await getDownloadURL(ref(await FirebaseService.obtenerStorage(), this.archivo.uuid + "/" + this.archivo.nombre))
-      this.cargando = false;
-      window.location.href = url;
+      try {
+        const url = await getDownloadURL(ref(await FirebaseService.obtenerStorage(), this.archivo.uuid + "/" + this.archivo.nombre))
+        window.location.href = url;
+      } catch (error) {
+        this.$buefy.toast.open({
+          message: "Error descargando archivo. Tal vez no tiene los permisos suficientes. Error: " + error.message,
+          type: 'is-danger'
+        });
+      } finally {
+        this.cargando = false;
+      }
     }
   }
 }
