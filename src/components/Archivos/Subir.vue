@@ -39,6 +39,8 @@
 <script>
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import FirebaseService from "../../services/FirebaseService.js";
+import { addDoc } from '@firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 export default {
   data: () => ({
     archivo: null,
@@ -52,15 +54,14 @@ export default {
         return;
       }
       const nombre = this.archivo.name;
-      console.log({ nombre });
+      const uuid = uuidv4();
       const storage = await FirebaseService.obtenerStorage();
-      const tarea = uploadBytesResumable(ref(storage, nombre), this.archivo);
+      const tarea = uploadBytesResumable(ref(storage, uuid + "/" + nombre), this.archivo);
       this.estaSubiendo = true;
       this.estaPausado = false;
       tarea.on("state_changed",
         (snapshot) => {
           this.progreso = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log({ snapshot });
           if (snapshot.state === "paused") {
             this.estaPausado = true;
           } else if (snapshot.state === "running") {
@@ -72,11 +73,19 @@ export default {
             message: "Error subiendo archivo: " + error.message,
             type: 'is-danger'
           });
-          console.log({ error });
         },
-        () => {
+        async () => {
           this.$buefy.toast.open({
-            message: "Archivo subido correctamente",
+            message: "Archivo subido. Guardando detalles...",
+            type: 'is-info'
+          });
+          await addDoc(await FirebaseService.obtenerColeccionArchivos(), {
+            uuid,
+            nombre,
+            fecha: new Date().getTime(),
+          });
+          this.$buefy.toast.open({
+            message: "Subida terminada correctamente",
             type: 'is-success'
           });
           this.estaSubiendo = false;
