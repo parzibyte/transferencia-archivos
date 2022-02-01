@@ -1,5 +1,7 @@
 # transferencia-archivos
 
+La demostración y explicación están en mi blog: https://parzibyte.me/blog/2022/02/01/aplicacion-transferencia-archivos-gratuita-open-source/
+
 ## Project setup
 ```
 npm install
