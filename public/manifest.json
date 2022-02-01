@@ -1,0 +1,17 @@
+{
+    "name": "Transferencia de archivos by Parzibyte",
+    "short_name": "Transferencia de archivos",
+    "theme_color": "#2196f3",
+    "background_color": "#2196f3",
+    "display": "standalone",
+    "orientation": "portrait",
+    "scope": "./",
+    "start_url": "./",
+    "icons": [
+        {
+            "src": "./exchange.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}
