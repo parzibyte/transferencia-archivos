@@ -99,7 +99,7 @@ export default {
     async copiarAlPortapapeles(archivo) {
       try {
         this.cargando = true;
-        await navigator.clipboard.writeText(`${window.location.origin}/` + this.enlaceParaDescargar(archivo));
+        await navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}` + this.enlaceParaDescargar(archivo));
         this.$buefy.toast.open({
           message: "Copiado",
           type: 'is-success'
