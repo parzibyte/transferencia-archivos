@@ -63,8 +63,9 @@
   </div>
 </template>
 <script>
-import { onSnapshot, query } from '@firebase/firestore';
+import { deleteDoc, doc, onSnapshot, query } from '@firebase/firestore';
 import FirebaseService from '../../services/FirebaseService';
+import { deleteObject, ref } from '@firebase/storage';
 export default {
   data: () => ({
     archivos: [],
@@ -74,6 +75,24 @@ export default {
     await this.obtenerArchivosYEscucharCambios();
   },
   methods: {
+    async eliminar(archivo) {
+      this.$buefy.dialog.confirm({
+        message: `¿Eliminar archivo? Esto no se puede deshacer`,
+        cancelText: "Cancelar",
+        confirmText: "Sí, eliminar",
+        onConfirm: async () => {
+          this.cargando = true;
+          await deleteObject(
+            ref(await FirebaseService.obtenerStorage(), archivo.uuid + "/" + archivo.nombre)
+          );
+          await deleteDoc(
+            doc(await FirebaseService.obtenerFirestore(), "archivos", archivo.id)
+          );
+          this.cargando = false;
+          this.$buefy.toast.open("Eliminado");
+        },
+      });
+    },
     subirArchivo() {
       this.$router.push({ name: "Subir" });
     },
