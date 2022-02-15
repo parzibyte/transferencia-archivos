@@ -111,6 +111,9 @@ export default {
           await deleteDoc(
             doc(await FirebaseService.obtenerFirestore(), "archivos", archivo.id)
           );
+          await deleteDoc(
+            doc(await FirebaseService.obtenerFirestore(), "descargasArchivos", archivo.id)
+          );
           this.cargando = false;
           this.$buefy.toast.open("Eliminado");
         },
