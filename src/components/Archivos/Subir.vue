@@ -49,7 +49,7 @@
 <script>
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import FirebaseService from "../../services/FirebaseService.js";
-import { addDoc } from '@firebase/firestore';
+import { addDoc, doc, setDoc, } from '@firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 export default {
   data: () => ({
@@ -94,11 +94,12 @@ export default {
             message: "Archivo subido. Guardando detalles...",
             type: 'is-info'
           });
-          await addDoc(await FirebaseService.obtenerColeccionArchivos(), {
+          const documentoRecienCreado = await addDoc(await FirebaseService.obtenerColeccionArchivos(), {
             uuid,
             nombre,
             fecha: new Date().getTime(),
           });
+          await setDoc(doc(await FirebaseService.obtenerFirestore(), "descargasArchivos", documentoRecienCreado.id), { descargas: [] });
           this.$buefy.toast.open({
             message: "Subida terminada correctamente",
             type: 'is-success'

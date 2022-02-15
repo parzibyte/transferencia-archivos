@@ -32,6 +32,9 @@
           >
             {{ props.row.fecha | timestampAFecha }}
           </b-table-column>
+          <b-table-column field="id" label="Descargas" v-slot="props">
+            {{ descargasDeArchivo(props.row.id) }}
+          </b-table-column>
           <b-table-column field="uuid" label="Enlace" v-slot="props">
             <b-button
               type="is-info"
@@ -69,15 +72,19 @@ import { deleteObject, ref } from '@firebase/storage';
 export default {
   data: () => ({
     archivos: [],
+    descargas: [],
     cargando: false,
   }),
   async mounted() {
     await this.obtenerArchivosYEscucharCambios();
   },
   methods: {
+    descargasDeArchivo(idArchivo) {
+      return this.descargas.find(descarga => descarga.id === idArchivo);
+    },
     async eliminar(archivo) {
       this.$buefy.dialog.confirm({
-        message: `¿Eliminar archivo? Esto no se puede deshacer`,
+        message: `¿Eliminar <code>${archivo.nombre}</code>? Esto no se puede deshacer`,
         cancelText: "Cancelar",
         confirmText: "Sí, eliminar",
         onConfirm: async () => {
@@ -123,6 +130,9 @@ export default {
     indiceDeArchivo(idArchivo) {
       return this.archivos.findIndex((archivo) => archivo.id === idArchivo);
     },
+    indiceDeDescarga(idDescarga) {
+      return this.descargas.findIndex((descarga) => descarga.id === idDescarga);
+    },
     async obtenerArchivosYEscucharCambios() {
       this.archivos = [];
       this.cargando = true;
@@ -146,6 +156,32 @@ export default {
             const indice = this.indiceDeArchivo(idArchivo);
             if (indice !== -1) {
               this.archivos.splice(indice, 1);
+            }
+          }
+        });
+        this.cargando = false;
+      });
+
+      const coleccionDescargasArchivos = await FirebaseService.obtenerColeccionDescargasArchivos();
+      onSnapshot(query(coleccionDescargasArchivos), (instantanea) => {
+        instantanea.docChanges().forEach((cambio) => {
+          this.cargando = true;
+          const descarga = cambio.doc.data();
+          const idDescarga = cambio.doc.id;
+          if (cambio.type === "added") {
+            descarga.id = idDescarga;
+            this.descargas.push(descarga);
+          }
+          if (cambio.type === "modified") {
+            const indice = this.indiceDeDescarga(idDescarga);
+            if (indice !== -1) {
+              this.$set(this.descargas, indice, descarga);
+            }
+          }
+          if (cambio.type === "removed") {
+            const indice = this.indiceDeDescarga(idDescarga);
+            if (indice !== -1) {
+              this.descargas.splice(indice, 1);
             }
           }
         });

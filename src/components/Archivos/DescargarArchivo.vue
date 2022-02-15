@@ -27,27 +27,37 @@
   </div>
 </template>
 <script>
-import { doc, getDoc, } from '@firebase/firestore';
+import { doc, getDoc, updateDoc, } from '@firebase/firestore';
 import FirebaseService from '../../services/FirebaseService';
 import { getDownloadURL, ref } from '@firebase/storage';
 export default {
   data: () => ({
     archivo: {},
+    referenciaDescargas: {},
+    descargas: { descargas: {} },
     cargando: false,
   }),
   async mounted() {
     this.cargando = true;
     const id = this.$route.params.id;
     const referenciaAlDocumento = doc(await FirebaseService.obtenerFirestore(), "archivos", id);
+    const referenciaDescargas = doc(await FirebaseService.obtenerFirestore(), "descargasArchivos", id);
+    this.referenciaDescargas = referenciaDescargas;
     const instantaneaDocumento = await getDoc(referenciaAlDocumento);
+    const instantaneaDescargas = await getDoc(referenciaDescargas);
     this.cargando = false;
     if (instantaneaDocumento.exists()) {
       this.archivo = instantaneaDocumento.data();
+    }
+    if (instantaneaDescargas.exists()) {
+      this.descargas = instantaneaDescargas.data();
     }
   },
   methods: {
     async descargar() {
       this.cargando = true;
+      this.descargas.descargas.push(new Date().getTime());
+      await updateDoc(this.referenciaDescargas, { descargas: this.descargas.descargas });
       try {
         const url = await getDownloadURL(ref(await FirebaseService.obtenerStorage(), this.archivo.uuid + "/" + this.archivo.nombre))
         window.location.href = url;
