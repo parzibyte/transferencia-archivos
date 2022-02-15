@@ -33,7 +33,19 @@
             {{ props.row.fecha | timestampAFecha }}
           </b-table-column>
           <b-table-column field="id" label="Descargas" v-slot="props">
-            {{ descargasDeArchivo(props.row.id) }}
+            <strong
+              >{{ descargasDeArchivo(props.row.id).length }} descargas</strong
+            >
+            <ul>
+              <li
+                v-for="(descarga, claveDescarga) in descargasDeArchivo(
+                  props.row.id
+                )"
+                :key="claveDescarga"
+              >
+                {{ descarga | timestampAFecha }}
+              </li>
+            </ul>
           </b-table-column>
           <b-table-column field="uuid" label="Enlace" v-slot="props">
             <b-button
@@ -80,7 +92,11 @@ export default {
   },
   methods: {
     descargasDeArchivo(idArchivo) {
-      return this.descargas.find(descarga => descarga.id === idArchivo);
+      const posiblesDescargas = this.descargas.find(descarga => descarga.id === idArchivo);
+      if (posiblesDescargas) {
+        return posiblesDescargas.descargas;
+      }
+      return [];
     },
     async eliminar(archivo) {
       this.$buefy.dialog.confirm({
@@ -168,6 +184,7 @@ export default {
           this.cargando = true;
           const descarga = cambio.doc.data();
           const idDescarga = cambio.doc.id;
+          descarga.id = idDescarga;
           if (cambio.type === "added") {
             descarga.id = idDescarga;
             this.descargas.push(descarga);
