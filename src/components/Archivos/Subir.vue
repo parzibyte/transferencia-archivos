@@ -6,6 +6,7 @@
           type="is-success"
           icon-right="format-list-numbered"
           @click="verArchivos()"
+          :disabled="estaSubiendo"
           >Ver archivos</b-button
         >
       </div>
@@ -13,7 +14,12 @@
     <div class="columns">
       <div class="column">
         <b-field>
-          <b-upload v-model="archivo" drag-drop expanded>
+          <b-upload
+            :disabled="estaSubiendo"
+            v-model="archivo"
+            drag-drop
+            expanded
+          >
             <section class="section">
               <div class="content has-text-centered">
                 <p>
@@ -39,7 +45,11 @@
           show-value
           format="percent"
         ></b-progress>
-        <b-button :loading="estaSubiendo" type="is-success" @click="subir"
+        <b-button
+          :disabled="estaSubiendo"
+          :loading="estaSubiendo"
+          type="is-success"
+          @click="subir"
           >Subir</b-button
         >
       </div>
@@ -58,6 +68,15 @@ export default {
     estaPausado: false,
     progreso: 0,
   }),
+  mounted() {
+    window.addEventListener("beforeunload", (evento) => {
+      if (this.estaSubiendo) {
+        evento.preventDefault();
+        evento.returnValue = "";
+        return "";
+      }
+    });
+  },
   methods: {
     verArchivos() {
       this.$router.push({
