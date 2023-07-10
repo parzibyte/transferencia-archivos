@@ -16,6 +16,7 @@
         <b-field>
           <b-upload
             :disabled="estaSubiendo"
+            @change.native="onArchivosSeleccionados"
             v-model="archivo"
             drag-drop
             expanded
@@ -78,6 +79,9 @@ export default {
     });
   },
   methods: {
+    onArchivosSeleccionados(){
+      this.subir();
+    },
     verArchivos() {
       this.$router.push({
         name: "VerArchivos",
