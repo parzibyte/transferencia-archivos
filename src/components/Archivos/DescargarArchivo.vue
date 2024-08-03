@@ -4,18 +4,25 @@
     <div class="column has-text-centered" v-show="archivo.nombre">
       <p class="title">Listos para descargar</p>
       <p class="subtitle">{{ archivo.nombre }}</p>
-      <b-button @click="descargar()" type="is-success" icon-right="download"
-        >Descargar
+      <b-notification type="is-warning" has-icon :closable="false">
+        <strong>Declaración de Responsabilidad</strong>
+        <p>
+          Entiendo y acepto que es mi responsabilidad respaldar este archivo. En caso de pérdida o eliminación, soy
+          consciente de que el reenvío del mismo puede incurrir en un costo adicional, a discreción del desarrollador,
+          equivalente o superior al monto pagado inicialmente para acceder al archivo actual.
+        </p>
+        <p>
+          Asimismo, acepto que este archivo será eliminado en unos días y que el enlace de descarga expirará a
+          discreción del desarrollador. Por lo tanto, debo descargarlo lo antes posible.
+        </p>
+      </b-notification>
+      <b-field>
+        <b-checkbox v-model="aceptaCondiciones">He leído y acepto las condiciones listadas arriba</b-checkbox>
+      </b-field>
+      <b-button :disabled="!aceptaCondiciones" @click="descargar()" type="is-success" icon-right="download">Descargar
       </b-button>
       <br />
       <br />
-      <b-notification type="is-info" :closable="false" has-icon>
-        <p class="is-size-5">
-          No olvide respaldar el archivo, ya que el enlace tiene una fecha de
-          expiración. Además, la mayoría de veces el reenvío del archivo tiene
-          un costo
-        </p>
-      </b-notification>
     </div>
     <div class="column has-text-centered" v-show="!archivo.nombre && !cargando">
       <p class="title">Enlace inválido</p>
@@ -36,6 +43,7 @@ export default {
     referenciaDescargas: {},
     descargas: { descargas: {} },
     cargando: false,
+    aceptaCondiciones: false,
   }),
   async mounted() {
     this.cargando = true;
